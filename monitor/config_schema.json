@@ -1,0 +1,48 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "log_level": {
+      "type": "string",
+      "enum": ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
+    },
+    "resources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "name", "url", "method", "port",
+          "error_code", "success_code",
+          "check_interval", "retry_interval", "max_attempts"
+        ],
+        "properties": {
+          "name": { "type": "string" },
+          "url": { "type": "string", "format": "uri" },
+          "method": { "type": "string", "enum": ["GET", "POST"] },
+          "port": { "type": "integer", "minimum": 1, "maximum": 65535 },
+          "error_code": { "type": "integer" },
+          "success_code": { "type": "integer" },
+          "check_interval": { "type": "integer", "minimum": 1 },
+          "retry_interval": { "type": "integer", "minimum": 1 },
+          "max_attempts": { "type": "integer", "minimum": 1 }
+        }
+      }
+    },
+    "telegram_users": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "telegram_id", "role"],
+        "properties": {
+          "name": { "type": "string" },
+          "telegram_id": { "type": "integer" },
+          "role": {
+            "type": "string",
+            "enum": ["Admin", "Auditor", "Spectator"]
+          }
+        }
+      }
+    }
+  },
+  "required": ["log_level", "resources", "telegram_users"]
+}
