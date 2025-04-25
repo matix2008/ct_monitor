@@ -73,8 +73,9 @@ class TelegramNotifier(Notifier):
 
     async def start_handler(self, update: Update, _context: ContextTypes.DEFAULT_TYPE):
         """Команда /start — приветственное сообщение."""
-        await update.message.reply_text(
-            "👋 Привет! Я бот мониторинга. Используй /help, чтобы увидеть команды.")
+        user = update.effective_user
+        await update.message.reply_text(f"👋 Привет, {user.full_name}! Добро пожаловать. Я бот для монитринга. Используй /help, чтобы увидеть команды.")
+        self.logger.info("Новый пользователь начал сессию: %s [%d]", user.full_name, user.id)
 
     async def shutdown_handler(self, update: Update, _context: ContextTypes.DEFAULT_TYPE):
         """Команда /shutdown — завершение работы монитора."""
