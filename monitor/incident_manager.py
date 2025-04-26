@@ -3,6 +3,7 @@
 import json
 import os
 from typing import Dict, List
+from monitor.endpoint import Endpoint
 from monitor.incident import Incident
 from monitor.notifier import Notifier
 
@@ -14,13 +15,14 @@ class IncidentManager:
     def __init__(self, log_file: str = "logs/incidents.jsonl"):
         self.log_file = log_file
         self.notifier = None
+        self.all_endpoints = None
         self.active_incidents: Dict[str, Incident] = {}
         self._load_active_incidents()
 
-    def register_incident(self, resource_name: str):
+    def register_incident(self, resource_name: str, code: int):
         """Открывает инцидент, если он ещё не активен."""
         if resource_name not in self.active_incidents:
-            incident = Incident(resource_name)
+            incident = Incident(resource_name, code)
             self.active_incidents[resource_name] = incident
             self._append_to_log(incident.to_dict())
             if self.notifier:
@@ -38,12 +40,19 @@ class IncidentManager:
 
     def set_notifier(self, notifier: Notifier):
         """Устанавливает уведомитель."""
-
         self.notifier = notifier
+
+    def set_endpoints(self, all_endpoints: List[Endpoint]):
+        """Устанавливает точки мониторинга."""
+        self.all_endpoints = all_endpoints
 
     def get_active(self) -> List[Incident]:
         """Возвращает список всех активных инцидентов."""
         return list(self.active_incidents.values())
+
+    def get_all_ep_names(self) -> List[str]:
+        """Возвращает список всех уникальных имён ресурсов."""
+        return [ep.get_name() for ep in self.all_endpoints]
 
     def reload_active_incidents(self):
         """Переоткрывает активные инциденты из журнала."""
@@ -66,7 +75,7 @@ class IncidentManager:
                 try:
                     data = json.loads(line)
                     if data.get("end_time") is None:
-                        incident = Incident(data["resource_name"])
+                        incident = Incident(data["resource_name"],data["code"])
                         incident.start_time = data["start_time"]
                         self.active_incidents[data["resource_name"]] = incident
                 except (json.JSONDecodeError, KeyError):

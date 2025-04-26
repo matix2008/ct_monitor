@@ -7,7 +7,8 @@ import logging
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
 from telegram.error import TelegramError
-from monitor.incident_manager import Incident, IncidentManager
+from monitor.incident import Incident
+from monitor.incident_manager import IncidentManager
 from monitor.notifier import Notifier
 
 class TelegramNotifier(Notifier):
@@ -44,6 +45,7 @@ class TelegramNotifier(Notifier):
         self.app.add_handler(CommandHandler("shutdown", self.shutdown_handler))
         self.app.add_handler(CommandHandler("help", self.help_handler))
         self.app.add_handler(CommandHandler("status", self.status_handler))
+        self.app.add_handler(CommandHandler("incidents", self.incidents_handler))
         self.app.add_handler(CommandHandler("refresh", self.refresh_handler))
         self.app.add_handler(CommandHandler("whoami", self.whoami_handler))
         # Добавим обработчик для всех неизвестных команд
@@ -93,7 +95,8 @@ class TelegramNotifier(Notifier):
             "/start — приветствие\n"
             "/help — показать справку\n"
             "/whoami — ваш Telegram ID и роль\n"
-            "/status — текущие инциденты (Admin/Auditor)\n"
+            "/status — текущий статус по всем точкам (Admin/Auditor)\n"
+            "/incidents — текущие инциденты (Admin/Auditor)\n"
             "/refresh — перечитать журнал (Admin)\n"
             "/shutdown — завершить работу монитора (Admin)"
         )
@@ -107,7 +110,39 @@ class TelegramNotifier(Notifier):
 
     async def status_handler(self, update: Update, _context: ContextTypes.DEFAULT_TYPE):
         """
-        Команда /status — показывает текущие активные инциденты.
+        Показывает статусы всех точек мониторинга: активные инциденты и нормальные ресурсы.
+        Доступно для Admin и Auditor.
+        """
+        user_id = update.effective_user.id
+        if not self.is_admin_or_auditor(user_id):
+            await update.message.reply_text("⛔ Только для ролей Admin и Auditor.")
+            return
+
+        # Получаем список всех зарегистрированных точек мониторинга
+        all_endpoints = list(self.incidents.get_all_ep_names())
+        # Получаем список активных инцидентов
+        active = self.incidents.get_active()
+
+        if not all_endpoints:
+            await update.message.reply_text("📋 Нет зарегистрированных точек мониторинга.")
+            return
+
+        lines = []
+        for ep in all_endpoints:
+            for incident in active:
+                if ep.get_name() == incident.resource_name:
+                    lines.append(f"❗ {ep} — сбой с {incident.start_time}")
+                    break
+            else:
+                # Если не нашли инцидент для этой точки, значит она в норме
+                lines.append(f"✅ {ep} — в норме")
+
+        full_message = "📈 Статусы ресурсов:\n\n" + "\n".join(lines)
+        await update.message.reply_text(full_message)
+
+    async def incidents_handler(self, update: Update, _context: ContextTypes.DEFAULT_TYPE):
+        """
+        Команда /incidents — показывает текущие активные инциденты.
         Доступно только Admin и Auditor.
         """
         user_id = update.effective_user.id

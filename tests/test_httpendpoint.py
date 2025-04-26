@@ -70,3 +70,47 @@ def test_check_status_exception(_mock_request):
     ok, code = endpoint.check_status()
     assert ok is False
     assert code == -1
+
+@patch("monitor.httpendpoint.requests.request")
+def test_check_status_not_found(mock_request):
+    """
+    Проверяет, что check_status корректно обрабатывает код 404.
+    """
+    endpoint = make_endpoint()
+    mock_response = Mock(status_code=404)
+    mock_request.return_value = mock_response
+
+    ok, code = endpoint.check_status()
+    assert ok is False
+    assert code == 404
+
+@patch("monitor.httpendpoint.requests.request")
+def test_check_status_with_post(mock_request):
+    """
+    Проверяет, что check_status выполняет POST-запрос.
+    """
+    endpoint = make_endpoint(
+        url="http://localhost/healthcheck",
+        port=0,
+        method="POST"
+    )
+    mock_response = Mock(status_code=200)
+    mock_request.return_value = mock_response
+
+    ok, code = endpoint.check_status()
+    assert ok is True
+    assert code == 200
+    mock_request.assert_called_with(
+        "POST", "http://localhost/healthcheck", timeout=5
+    )
+
+def test_url_with_embedded_port():
+    """
+    Проверяет, что порт из URL не затирается дополнительным port-параметром.
+    """
+    endpoint = make_endpoint(
+        url="http://svc2.copytrust.ru:15778/RegistrationService/web/2/healthcheck",
+        port=0  # Порт не должен добавляться снова
+    )
+    assert endpoint.build_full_url() == \
+        "http://svc2.copytrust.ru:15778/RegistrationService/web/2/healthcheck"

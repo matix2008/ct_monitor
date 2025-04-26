@@ -39,6 +39,7 @@ def main():
         incidents.set_notifier(notifier)
 
         # Получить список ресурсов из конфигурации и запустить потоки мониторинга
+        endpoints = []
         resources = config_loader.get_resources()
         for resource_config in resources:
             if "--test" in sys.argv:
@@ -46,9 +47,13 @@ def main():
                 resource_config["retry_interval"] = 1
             # Создать экземпляр HttpEndpoint и MonitorThread для каждого ресурса
             endpoint = HttpEndpoint(resource_config)
+            endpoints.append(endpoint)
             thread = MonitorThread(endpoint, resource_config, logger, incidents)
             thread.start()
             threads.append(thread)
+
+        # Установить все точки мониторинга в менеджер инцидентов
+        incidents.set_endpoints(endpoints)
 
         # Запустить уведомитель, если не в тестовом режиме
         # Если в тестовом режиме, пропустить запуск уведомителя
