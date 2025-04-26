@@ -21,16 +21,17 @@
 - Мониторинг HTTP/контрольных точек
 - Обработка нестабильных и устойчивых ошибок
 - Telegram-уведомления:
-  - об инциденте
+  - об инциденте (-тах)
   - о восстановлении
   - о системных событиях (запуск, сбой, завершение)
-- Telegram-бот: команды `/start`, `/status`, `/refresh`, `/whoami`, `/help`
+- Telegram-бот: команды `/start`, `/status`, `/incidents`, `/refresh`, `/whoami`, `/help`
 - Ролевая модель: Admin, Auditor, Spectator
 
 ---
 
 ## Структура
 
+```markdown
 ct_monitor/
 │
 ├── requirements.txt
@@ -55,8 +56,7 @@ ct_monitor/
 │   ├── test_incident_manager.py (тест регистрации/закрытия инцидента)
 │   ├── test_telegram.py (тест команды /status (с моком))
 └── README.md
-
----
+```
 
 ## Установка
 
