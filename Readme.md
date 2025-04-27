@@ -63,7 +63,7 @@ ct_monitor/
 1. Клонируйте репозиторий:
 
    ```bash
-   git clone https://github.com/your-org/ct_monitor.git
+   git clone https://github.com/matix2008/ct_monitor
    cd ct_monitor
    ```
 
