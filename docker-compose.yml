@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  ct_monitor:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ct_monitor
+    restart: unless-stopped
+    volumes:
+      - ./config.json:/app/config.json
+      - ./.secret.json:/app/.secret.json
+      - ./logs:/app/logs
+    environment:
+      - PYTHONUNBUFFERED=1
+    ports:
+      - "8080:8080"   # только если ты захочешь добавить healthcheck через HTTP

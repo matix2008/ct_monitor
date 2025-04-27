@@ -157,6 +157,43 @@ docker run --rm \
   ct-monitor
 ```
 
+### Использование docker-compose
+
+Создайте файл docker-compose.yml
+
+```yaml
+version: '3.8'
+
+services:
+  ct_monitor:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ct_monitor
+    restart: unless-stopped
+    volumes:
+      - ./config.json:/app/config.json
+      - ./.secret.json:/app/.secret.json
+      - ./logs:/app/logs
+    environment:
+      - PYTHONUNBUFFERED=1
+    ports:
+      - "8080:8080"  # Только если добавится HTTP-интерфейс
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; sock=socket.socket(); sock.connect(('localhost', 8080))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+```
+
+Запуск и остановка
+
+```bash
+docker-compose up -d --build
+
+docker-compose down
+```
+
 ---
 
 ## Логи
