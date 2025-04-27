@@ -36,6 +36,7 @@ ct_monitor/
 │
 ├── requirements.txt
 ├── Dockerfile
+├── docker-compose.yml
 ├── main.py (точка входа)
 ├── monitor/
 │   ├── config.py (работа с конфигурацией)
