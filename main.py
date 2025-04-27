@@ -1,6 +1,7 @@
 """monitor/main.py - Главный файл для запуска мониторинга"""
 
 import sys
+import os
 from monitor.config import ConfigLoader
 from monitor.logger import setup_logger
 from monitor.incident_manager import IncidentManager
@@ -18,6 +19,7 @@ def main():
     logger = None
 
     try:
+        os.makedirs("logs", exist_ok=True)
         config_loader = ConfigLoader()
         config_loader.load()
 

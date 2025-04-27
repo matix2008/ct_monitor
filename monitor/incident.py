@@ -1,7 +1,7 @@
 """monitor/incident.py - Инцидент"""
 
 
-from datetime import datetime, UTC
+from datetime import datetime, timezone
 
 class Incident:
     """
@@ -11,12 +11,12 @@ class Incident:
     def __init__(self, resource_name: str, code: int):
         self.resource_name = resource_name
         self.code = code
-        self.start_time = datetime.now(UTC).isoformat()
+        self.start_time = datetime.now(timezone.utc).isoformat()
         self.end_time = None
 
     def close(self):
         """Закрывает инцидент, устанавливая время окончания."""
-        self.end_time = datetime.now(UTC).isoformat()
+        self.end_time = datetime.now(timezone.utc).isoformat()
 
     def to_dict(self):
         """Преобразует инцидент в словарь для сериализации."""

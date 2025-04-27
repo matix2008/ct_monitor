@@ -70,6 +70,12 @@ ct_monitor/
 2. Установите зависимости:
 
    ```bash
+   sudo apt update
+   sudo apt install python3-venv
+
+   python3 -m venv .venv
+   sudo source .venv/bin/activate
+
    pip install -r requirements.txt
    ```
 
