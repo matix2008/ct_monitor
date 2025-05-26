@@ -130,7 +130,7 @@ class TelegramNotifier(Notifier):
         lines = []
         for ep in all_endpoints:
             for incident in active:
-                if ep.get_name() == incident.resource_name:
+                if ep == incident.resource_name:
                     lines.append(f"❗ {ep} — сбой с {incident.start_time}")
                     break
             else:

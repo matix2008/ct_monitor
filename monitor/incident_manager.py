@@ -19,10 +19,10 @@ class IncidentManager:
         self.active_incidents: Dict[str, Incident] = {}
         self._load_active_incidents()
 
-    def register_incident(self, resource_name: str, code: int):
+    def register_incident(self, resource_name: str, code: int, response: str):
         """Открывает инцидент, если он ещё не активен."""
         if resource_name not in self.active_incidents:
-            incident = Incident(resource_name, code)
+            incident = Incident(resource_name, code, response)
             self.active_incidents[resource_name] = incident
             self._append_to_log(incident.to_dict())
             if self.notifier:
@@ -75,7 +75,7 @@ class IncidentManager:
                 try:
                     data = json.loads(line)
                     if data.get("end_time") is None:
-                        incident = Incident(data["resource_name"],data["code"])
+                        incident = Incident(data["resource_name"],data["code"],data["response"])
                         incident.start_time = data["start_time"]
                         self.active_incidents[data["resource_name"]] = incident
                 except (json.JSONDecodeError, KeyError):

@@ -44,7 +44,7 @@ def test_check_status_success(mock_request):
     endpoint = make_endpoint()
     mock_response = Mock(status_code=200)
     mock_request.return_value = mock_response
-    ok, code = endpoint.check_status()
+    ok, code, _ = endpoint.check_status()
     assert ok is True
     assert code == 200
 
@@ -56,7 +56,7 @@ def test_check_status_failure(mock_request):
     endpoint = make_endpoint()
     mock_response = Mock(status_code=500)
     mock_request.return_value = mock_response
-    ok, code = endpoint.check_status()
+    ok, code, _ = endpoint.check_status()
     assert ok is False
     assert code == 500
 
@@ -67,7 +67,7 @@ def test_check_status_exception(_mock_request):
     Проверяет, что check_status обрабатывает исключения и возвращает код -1.
     """
     endpoint = make_endpoint()
-    ok, code = endpoint.check_status()
+    ok, code, _= endpoint.check_status()
     assert ok is False
     assert code == -1
 
@@ -80,7 +80,7 @@ def test_check_status_not_found(mock_request):
     mock_response = Mock(status_code=404)
     mock_request.return_value = mock_response
 
-    ok, code = endpoint.check_status()
+    ok, code, _ = endpoint.check_status()
     assert ok is False
     assert code == 404
 
@@ -97,7 +97,7 @@ def test_check_status_with_post(mock_request):
     mock_response = Mock(status_code=200)
     mock_request.return_value = mock_response
 
-    ok, code = endpoint.check_status()
+    ok, code, _ = endpoint.check_status()
     assert ok is True
     assert code == 200
     mock_request.assert_called_with(

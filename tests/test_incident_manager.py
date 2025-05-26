@@ -9,12 +9,13 @@ def test_register_and_resolve_incident(tmp_path):
     log_file = tmp_path / "incidents.jsonl"
     manager = IncidentManager(log_file=str(log_file))
 
-    manager.register_incident("test_resource", code=500)
+    manager.register_incident("test_resource", code=500, response ="internal error")
     active = manager.get_active()
     assert len(active) == 1
     assert active[0].resource_name == "test_resource"
     assert active[0].code == 500
     assert active[0].end_time is None
+    assert active[0].response == "internal error"
 
     manager.resolve_incident("test_resource")
     assert len(manager.get_active()) == 0
@@ -32,7 +33,7 @@ def test_reload_active_incidents(tmp_path):
     log_file = tmp_path / "incidents.jsonl"
     manager = IncidentManager(log_file=str(log_file))
 
-    manager.register_incident("res1", code=500)
+    manager.register_incident("res1", code=500, response ="internal error")
 
     incident = Incident("res2", code=500)
     incident.close()
@@ -45,13 +46,13 @@ def test_reload_active_incidents(tmp_path):
     new_manager = IncidentManager(log_file=str(log_file))
     active = new_manager.get_active()
     assert len(active) == 1
-    assert active[0].resource_name == "res1" and active[0].code == 500
+    assert active[0].resource_name == "res1" and active[0].code == 500 and active[0].response == "internal error"
 
 
 def test_double_registration(tmp_path):
     """Проверяет защиту от повторной регистрации одного и того же инцидента."""
     log_file = tmp_path / "incidents.jsonl"
     manager = IncidentManager(log_file=str(log_file))
-    manager.register_incident("r1", code=500)
-    manager.register_incident("r1", code=500)
+    manager.register_incident("r1", code=500, response ="internal error")
+    manager.register_incident("r1", code=500, response ="internal error")
     assert len(manager.get_active()) == 1

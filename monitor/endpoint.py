@@ -10,10 +10,10 @@ class Endpoint(ABC):
     """
 
     @abstractmethod
-    def check_status(self) -> Tuple[bool, int]:
+    def check_status(self) -> Tuple[bool, int, str]:
         """
         Проверяет доступность ресурса.
-        :return: кортеж (успех: bool, http-код: int)
+        :return: кортеж (успех: bool, http-код: int, response: str)
         """
 
     @abstractmethod

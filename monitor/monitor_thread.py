@@ -40,21 +40,21 @@ class MonitorThread(threading.Thread):
         try:
             while not self._stop_event.is_set():
                 # Проверяем состояние точки
-                status, code = self.endpoint.check_status()
+                status, code, resp = self.endpoint.check_status()
 
                 if not self.in_incident and not status:
-                    self.logger.warning("%s — ошибка %s. Начинаем повторные попытки...", \
-                                        self.name, code)
+                    self.logger.warning("%s — ошибка %s, %s. Начинаем повторные попытки...", \
+                                        self.name, code, resp)
                     if self._check_stability(expected=False):
                         self.logger.warning("%s — подтвержденный сбой. Открываем инцидент.", \
                                         self.name)
                         self.in_incident = True
                         if self.incidents:
-                            self.incidents.register_incident(self.name)
+                            self.incidents.register_incident(self.name, code, resp)
 
                 elif self.in_incident and status:
-                    self.logger.info("%s — получен ответ %s. Проверка восстановления...", \
-                                    self.name, code)
+                    self.logger.info("%s — получен ответ %s, %s. Проверка восстановления...", \
+                                    self.name, code, resp)
                     if self._check_stability(expected=True):
                         self.logger.warning("%s — инцидент закрыт. Устойчивое восстановление.", \
                                         self.name)
@@ -84,7 +84,7 @@ class MonitorThread(threading.Thread):
                 return False
 
             # Проверяем состояние точки
-            status, code = self.endpoint.check_status()
+            status, code, _ = self.endpoint.check_status()
             self.logger.debug("%s — попытка %d: код %s, ожидаем %s", \
                               self.name, attempt + 1, code, expected)
 

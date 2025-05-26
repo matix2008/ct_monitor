@@ -23,7 +23,7 @@ class DummyEndpoint:
         else:
             code = 200
         print(f"[Dummy] Возвращаю: {code}")
-        return code == 200, code
+        return code == 200, code, "text of response"
 
     def get_name(self):
         """Возвращает имя точки мониторинга."""
@@ -52,7 +52,7 @@ def test_monitor_thread_triggers_incident():
     thread.stop()
     thread.join()
 
-    incident_manager.register_incident.assert_called_with("dummy")
+    incident_manager.register_incident.assert_called_with("dummy", 500, "text of response")
 
 
 def test_monitor_thread_resolves_incident():
@@ -64,7 +64,8 @@ def test_monitor_thread_resolves_incident():
     endpoint = DummyEndpoint("dummy", [200, 500, 500, 500, 500, 200, 200, 200])
     incident_manager = MagicMock()
     incident_manager.register_incident = \
-        MagicMock(side_effect=lambda name: print(f"[MOCK] Зарегистрирован инцидент: {name}"))
+        MagicMock(side_effect=lambda name, code, text: \
+                  print(f"[MOCK] Зарегистрирован инцидент: {name}, {code}, {text}"))
     incident_manager.resolve_incident = \
         MagicMock(side_effect=lambda name: print(f"[MOCK] Завершён инцидент: {name}"))
 
@@ -82,5 +83,5 @@ def test_monitor_thread_resolves_incident():
     thread.stop()
     thread.join()
 
-    incident_manager.register_incident.assert_called_with("dummy")
+    incident_manager.register_incident.assert_called_with("dummy", 500, "text of response")
     incident_manager.resolve_incident.assert_called_with("dummy")

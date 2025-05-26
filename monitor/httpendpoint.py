@@ -3,7 +3,9 @@
 from typing import Tuple
 from urllib.parse import urlparse
 import requests
+from bs4 import BeautifulSoup
 from monitor.endpoint import Endpoint
+
 
 class HttpEndpoint(Endpoint):
     """
@@ -37,7 +39,7 @@ class HttpEndpoint(Endpoint):
         netloc = f"{parsed.hostname}:{self.port}"
         return parsed._replace(netloc=netloc).geturl()
 
-    def check_status(self) -> Tuple[bool, int]:
+    def check_status(self) -> Tuple[bool, int, str]:
         """
         Выполняет HTTP-запрос к точке и возвращает статус работоспособности.
 
@@ -47,6 +49,35 @@ class HttpEndpoint(Endpoint):
         try:
             response = requests.request(self.method, full_url, timeout=5)
             code = response.status_code
-            return code == self.success_code, code
+            resp_text = self.extract_text_from_response(response)
+            return code == self.success_code, code, resp_text
         except requests.RequestException:
-            return False, -1
+            return False, -1, ""
+
+    def extract_text_from_response(self, response: requests.Response) -> str:
+        """
+        Возвращает чистый текст из ответа в зависимости от типа содержимого.
+        """
+        content_type = response.headers.get("Content-Type", "").lower()
+
+        try:
+            if "application/json" in content_type:
+                # Преобразуем JSON-ответ в строку
+                json_data = response.json()
+                return str(json_data)
+
+            elif "text/html" in content_type:
+                # Удаляем HTML-теги
+                soup = BeautifulSoup(response.text, "lxml")
+                return soup.get_text(separator=",", strip=True)
+
+            elif "text/plain" in content_type:
+                return response.text.strip()
+
+            else:
+                # Для всех других типов пробуем вывести
+                # часть текста (например, XML, markdown и т.д.)
+                return response.text.strip()
+
+        except Exception as e:
+            return f"[Ошибка при обработке ответа]: {e}"
