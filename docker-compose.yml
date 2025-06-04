@@ -8,15 +8,8 @@ services:
     container_name: ct_monitor
     restart: unless-stopped
     volumes:
-      - ./config.json:/app/config.json
-      - ./.secret.json:/app/.secret.json
-      - ./logs:/app/logs
+      - ./config.json:/monitor/config.json
+      - ./.secret.json:/monitor/.secret.json
+      - ./logs:/logs
     environment:
       - PYTHONUNBUFFERED=1
-    ports:
-      - "8080:8080"  # Только если добавится HTTP-интерфейс
-    healthcheck:
-      test: ["CMD", "python", "-c", "import socket; sock=socket.socket(); sock.connect(('localhost', 8080))"]
-      interval: 30s
-      timeout: 10s
-      retries: 3

@@ -4,22 +4,17 @@ FROM python:3.10-slim-bullseye
 # Обновляем пакеты для устранения известных уязвимостей
 RUN apt-get update && apt-get upgrade -y && apt-get clean
 
-# Создаем рабочую папку
-# WORKDIR /app
-
 # Копируем файлы проекта
-COPY ./requirements.txt /app/requirements.txt
+COPY ./requirements.txt /requirements.txt
 COPY ./main.py /main.py
-COPY ./monitor /app/monitor
+COPY ./monitor /monitor
 
 # Убедимся, что директория для логов существует
-RUN mkdir -p /app/logs
+RUN mkdir -p /logs
 
 # Устанавливаем зависимости
-RUN pip install --no-cache-dir -r /app/requirements.txt
-
-# Порт, если захочешь сделать healthcheck через Docker-сетку
-EXPOSE 8080
+RUN pip install --no-cache-dir -r /requirements.txt
 
 # Точка входа
 CMD ["python", "main.py"]
+

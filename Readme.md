@@ -140,51 +140,46 @@ pytest tests/
 
 ---
 
-## Docker
+## Docker и docker-compose
+
+### Убедиться в правильной структуре проекта
+
+ct_monitor/
+├── Dockerfile
+├── docker-compose.yml
+├── requirements.txt
+├── main.py
+├── config.json
+├── .secrets.json
+├── monitor/
+│   ├── __init__.py
+│   └── ...
+├── logs/              # Папка для логов (может быть создана автоматически)
+
+*Файлы config.json, .secrets.json должны лежать в корне.*
 
 ### Собрать изображение
+
+```bash
+docker-compose build
+```
+
+или вручную (менее предпочтительно)
 
 ```bash
 docker build -t ct-monitor .
 ```
 
-### Запустить с монтированными конфигами
+### Запустить
 
 ```bash
-docker run --rm \
-  -v $PWD/config.json:/app/config.json \
-  -v $PWD/.secrets.json:/app/.secrets.json \
-  -v $PWD/logs:/app/logs \
-  ct-monitor
+docker-compose up -d
 ```
 
-### Использование docker-compose
+или сразу со сборкой
 
-Создайте файл docker-compose.yml
-
-```yaml
-version: '3.8'
-
-services:
-  ct_monitor:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: ct_monitor
-    restart: unless-stopped
-    volumes:
-      - ./config.json:/app/config.json
-      - ./.secret.json:/app/.secret.json
-      - ./logs:/app/logs
-    environment:
-      - PYTHONUNBUFFERED=1
-    ports:
-      - "8080:8080"  # Только если добавится HTTP-интерфейс
-    healthcheck:
-      test: ["CMD", "python", "-c", "import socket; sock=socket.socket(); sock.connect(('localhost', 8080))"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+```bash
+docker-compose up -d --build
 ```
 
 Запуск и остановка
