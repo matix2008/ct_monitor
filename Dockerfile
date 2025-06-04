@@ -5,11 +5,11 @@ FROM python:3.10-slim-bullseye
 RUN apt-get update && apt-get upgrade -y && apt-get clean
 
 # Создаем рабочую папку
-WORKDIR /app
+# WORKDIR /app
 
 # Копируем файлы проекта
 COPY ./requirements.txt /app/requirements.txt
-COPY ./main.py /app/main.py
+COPY ./main.py /main.py
 COPY ./monitor /app/monitor
 
 # Убедимся, что директория для логов существует
