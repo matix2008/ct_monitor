@@ -31,7 +31,7 @@ def test_valid_config_load(tmp_path):
     config_path = tmp_path / "config.json"
     config_path.write_text(json.dumps(config_data), encoding="utf-8")
 
-    secret_path = tmp_path / ".secret.json"
+    secret_path = tmp_path / ".secrets.json"
     secret_path.write_text(json.dumps(secret_data), encoding="utf-8")
 
     # Минимальная JSON-схема для успешной валидации
@@ -79,7 +79,7 @@ def test_missing_fields(tmp_path):
     config_path = tmp_path / "bad_config.json"
     config_path.write_text(json.dumps(bad_config), encoding="utf-8")
 
-    secret_path = tmp_path / ".secret.json"
+    secret_path = tmp_path / ".secrets.json"
     secret_path.write_text(json.dumps(secret_data), encoding="utf-8")
 
     schema_data = {
@@ -107,7 +107,7 @@ def test_invalid_json(tmp_path):
     config_path = tmp_path / "invalid.json"
     config_path.write_text(broken, encoding="utf-8")
 
-    secret_path = tmp_path / ".secret.json"
+    secret_path = tmp_path / ".secrets.json"
     secret_path.write_text(json.dumps(secret_data), encoding="utf-8")
 
     loader = ConfigLoader()

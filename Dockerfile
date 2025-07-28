@@ -9,6 +9,10 @@ COPY ./requirements.txt /requirements.txt
 COPY ./main.py /main.py
 COPY ./monitor /monitor
 
+# Копируем конфигурационные файлы (будут перезаписаны при монтировании)
+COPY ./config.json /config.json
+COPY ./.secrets.json /.secrets.json
+
 # Убедимся, что директория для логов существует
 RUN mkdir -p /logs
 

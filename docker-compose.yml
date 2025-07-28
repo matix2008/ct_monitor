@@ -9,7 +9,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./config.json:/monitor/config.json
-      - ./.secret.json:/monitor/.secret.json
+      - ./.secrets.json:/monitor/.secrets.json
       - ./logs:/logs
     environment:
       - PYTHONUNBUFFERED=1

@@ -6,8 +6,8 @@ from typing import Any, Dict, Optional
 from jsonschema import validate, ValidationError
 
 # Значения по умолчанию для путей к конфигурационным файлам
-DEFAULT_CONFIG_PATH = Path("monitor/config.json")
-DEFAULT_SECRETS_PATH = Path("monitor/.secrets.json")
+DEFAULT_CONFIG_PATH = Path("config.json")
+DEFAULT_SECRETS_PATH = Path(".secrets.json")
 DEFAULT_SCHEMA_PATH = Path("monitor/config_schema.json")
 
 class ConfigError(Exception):
